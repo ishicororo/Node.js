@@ -3,7 +3,7 @@ const http=require('http');
 const ejs=require('ejs');
 const data=fs.readFileSync('indes.ejs','utf8');
 const server=http.createServer(
-    (req,res){
+    (req,res)=>{
         res.setHeader('Content-Type','text/html');
         res.write(data);
         res.end();
