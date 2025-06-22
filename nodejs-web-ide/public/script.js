@@ -16,7 +16,7 @@ let currentEditingFilePath = null; // 現在エディタで開いているファ
 function connectWebSocket() {
     // サーバーのポートに合わせる
     // 環境によっては 'ws://' の代わりに 'wss://' (Secure WebSocket) を使用
-    ws = new WebSocket('ws://' + window.location.host);
+    ws = new WebSocket('wss://' + window.location.hostname + ':3000');
 
     ws.onopen = () => {
         console.log('WebSocket connected');
