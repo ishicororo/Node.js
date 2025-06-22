@@ -1,7 +1,7 @@
 const fs=require('fs');
 const http=require('http');
 const ejs=require('ejs');
-const data=fs.readFileSync('indes.ejs','utf8');
+const data=fs.readFileSync('index.ejs','utf8');
 const server=http.createServer(
     (req,res)=>{
         res.setHeader('Content-Type','text/html');
