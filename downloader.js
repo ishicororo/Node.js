@@ -6,13 +6,20 @@ const { JSDOM } = require("jsdom");
 
 const targetUrl = process.argv[2];
 if (!targetUrl) {
-  console.log("使い方: node full-downloader.js https://example.com");
+  console.log("使い方: node downloader.js https://example.com");
   process.exit(1);
 }
 
+const origin = new URL(targetUrl).origin;
+const domain = new URL(targetUrl).hostname.replace(/[^a-z0-9.-]/gi, "_");
 const zip = new JSZip();
 const visited = new Set();
 const assetMap = {};
+
+const rootSaveDir = path.join(__dirname, "saved", "files", domain);
+const zipDir = path.join(__dirname, "saved", "zips");
+fs.mkdirSync(rootSaveDir, { recursive: true });
+fs.mkdirSync(zipDir, { recursive: true });
 
 function sanitize(url) {
   return url.replace(/[^a-z0-9]/gi, "_").slice(0, 128);
@@ -34,11 +41,15 @@ async function downloadFile(url, referer) {
 
     const ext = path.extname(new URL(url).pathname).split("?")[0] || ".bin";
     const name = sanitize(url) + ext;
-    const filePath = "assets/" + name;
+    const relative = path.join("assets", name);
+    const localPath = path.join(rootSaveDir, relative);
 
-    zip.file(filePath, res.data);
-    assetMap[url] = filePath;
-    return filePath;
+    fs.mkdirSync(path.dirname(localPath), { recursive: true });
+    fs.writeFileSync(localPath, res.data);
+
+    zip.file(relative, res.data);
+    assetMap[url] = relative;
+    return relative;
   } catch (e) {
     console.warn("⚠️ ダウンロード失敗:", url, "-", e.message);
     return url;
@@ -78,7 +89,6 @@ async function savePage(url) {
 
   const tasks = [];
 
-  // 画像・CSS・JSの取得
   for (const el of [...doc.querySelectorAll("link[href]"), ...doc.querySelectorAll("script[src]"), ...doc.querySelectorAll("img[src]")]) {
     const attr = el.getAttribute("href") || el.getAttribute("src");
     if (!attr || attr.startsWith("data:")) continue;
@@ -94,7 +104,6 @@ async function savePage(url) {
     } catch (e) {}
   }
 
-  // CSS <style> の中身も処理
   for (const el of doc.querySelectorAll("style")) {
     const css = el.textContent;
     tasks.push(
@@ -104,7 +113,6 @@ async function savePage(url) {
     );
   }
 
-  // 外部 CSS ファイルの内容も内部に保存
   for (const el of doc.querySelectorAll('link[rel="stylesheet"]')) {
     try {
       const href = new URL(el.href, url).href;
@@ -117,16 +125,19 @@ async function savePage(url) {
 
   await Promise.all(tasks);
 
-  // HTMLファイル追加
   const html = dom.serialize();
+  const indexPath = path.join(rootSaveDir, "index.html");
+  fs.writeFileSync(indexPath, html);
   zip.file("index.html", html);
+
+  const outZip = path.join(zipDir, `${domain}.zip`);
   console.log("📦 ZIP作成中...");
-
   const blob = await zip.generateAsync({ type: "nodebuffer" });
-  const outPath = path.resolve(__dirname, "saved.zip");
-  fs.writeFileSync(outPath, blob);
+  fs.writeFileSync(outZip, blob);
 
-  console.log("✅ 完全保存ZIP作成完了:", outPath);
+  console.log("✅ 完全保存完了:");
+  console.log("📁 展開保存:", indexPath);
+  console.log("📦 ZIP保存:", outZip);
 }
 
 savePage(targetUrl);
