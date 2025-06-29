@@ -1,0 +1,68 @@
+<!DOCTYPE html><html lang="ja"><head>
+  <meta charset="UTF-8">
+  <title>prime_tools</title>
+  <link rel="stylesheet" href="assets/https___ishicororo_github_io_Prime_tools_style_css.css">
+  <link rel="stylesheet" href="undefined">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="prime tools">
+  <link rel="apple-touch-icon" href="assets/https___ishicororo_github_io_Prime_tools_icon_png.png">
+</head>
+<body>
+  <header>
+      <p onclick="show(tools.home)">home</p>
+      <p onclick="show(tools.prime_check)">check</p>
+      <p onclick="show(tools.prime_create)">create</p>
+      <p onclick="show(tools.prime_code)">code</p>
+  </header>
+  <main>
+  <div class="open" id="home">
+    <h1>home</h1>
+  <h2>prime_tools</h2>
+    <p onclick="show(tools.prime_check)">check</p>
+    <p onclick="show(tools.prime_create)">create</p>
+    <p onclick="show(tools.prime_code)">code</p>
+  </div>
+  <div class="close" id="prime_check">
+    <h1>prime check</h1>
+    <input id="check" type="number" placeholder="判定したい数字を入力">
+    <button onclick="check()">判定</button>
+    <p id="checked"></p>
+  </div>
+  <div class="close" id="prime_create">
+    <h1>prime_create</h1>
+    <select id="createMethod" onchange="method()">
+      <option value="digit" selected="">桁数で生成</option>
+      <option value="max">指定した数以下の最大の素数を生成</option>
+      <option value="primesCreate">指定した範囲の素数配列を生成、保存</option>
+    </select> 
+    <input id="create" type="number" placeholder="生成したい桁数を入力">
+    <input type="number" id="newInput" placeholder="終了値を入力" class="close">
+    <button onclick="create()">生成</button>
+    <a id="downloadLink" class="close" download="prime.txt">ダウンロード</a>
+    <p id="created"></p>
+  </div>
+  <div class="close" id="prime_code">
+    <h1>prime code decipher&amp;create</h1>
+    <input type="text" placeholder="暗号化したい文字列を入力" id="code_text">
+    <input type="text" placeholder="鍵となる数字、文字列を入力　10文字以内、半角英数字" id="code_key">
+    <p id="code_result"></p>
+    <button onclick="execute()">暗号</button>
+    <button onclick="returnCode()">復号</button>
+  </div>
+  <div id="loadingMenu" class="close">
+    <h1>現在実行中...</h1>
+    <div id="loadBar"></div>
+    <p id="loadingPercentage"></p>
+  </div>
+  </main>
+  <script src="assets/https___ishicororo_github_io_Prime_tools_scripts_primes_js.js"></script>
+  <script src="assets/https___ishicororo_github_io_Prime_tools_scripts_script_js.js"></script>
+  <script src="assets/https___ishicororo_github_io_Prime_tools_scripts_open_js.js"></script>
+  <script src="assets/https___ishicororo_github_io_Prime_tools_scripts_check_js.js"></script>
+  <script src="assets/https___ishicororo_github_io_Prime_tools_scripts_CPmethod_js.js"></script>
+  <script src="assets/https___ishicororo_github_io_Prime_tools_scripts_create_js.js"></script>
+  <script src="assets/https___ishicororo_github_io_Prime_tools_scripts_code_js.js"></script>
+
+
+</body></html>
