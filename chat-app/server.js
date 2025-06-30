@@ -70,7 +70,8 @@ app.post('/api/register', async (req, res) => {
 });
 
 // ─── API: ルーム一覧取得 ────────────────
-app.get('/api/rooms', async (req, res) => {
+app.get('/api/rooms',requireLogin, async (req, res) => {
+  const user=req.session.user;
   const rooms = await fs.readJSON(ROOMS_FILE).catch(() => []);
   users = req.session.user;
   const userRooms = rooms.filter(room => {
