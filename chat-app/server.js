@@ -100,18 +100,37 @@ app.post('/api/rooms',requireLogin,async (req, res) => {
 io.on('connection', (socket) => {
   console.log('✅ クライアント接続');
 
-  socket.on('joinRoom', async (room) => {
-    socket.join(room);
-    const msgFile = path.join(MESSAGES_DIR, `${room}.json`);
+  // セッション取得用のラッパー（express-sessionが socket.request.session にある前提）
+  const req = socket.request;
+  const user = req.session?.user;
+
+  if (!user) {
+    socket.disconnect(true);
+    return;
+  }
+
+  socket.on('joinRoom', async (roomName) => {
+    const rooms = await fs.readJSON(ROOMS_FILE).catch(() => []);
+    const room = rooms.find(r => r.name === roomName);
+    if (!room) return;
+
+    if (!room.users || !room.users.includes(user)) {
+      return socket.emit('errorMessage', 'このルームには参加できません');
+    }
+
+    socket.join(roomName);
+
+    const msgFile = path.join(MESSAGES_DIR, `${roomName}.json`);
     const messages = await fs.readJSON(msgFile).catch(() => []);
     socket.emit('chatHistory', messages);
   });
 
-  socket.on('chatMessage', async ({ room, user, message }) => {
-    const timestamp = new Date().toISOString();
-    const msgObj = { user, message, timestamp };
+  socket.on('chatMessage', async ({ room, message }) => {
+    const timestamp = new Date().toLocaleString(); // 表示用に整える
 
+    const msgObj = { user, message, timestamp };
     const msgFile = path.join(MESSAGES_DIR, `${room}.json`);
+
     const messages = await fs.readJSON(msgFile).catch(() => []);
     messages.push(msgObj);
     await fs.writeJSON(msgFile, messages, { spaces: 2 });
