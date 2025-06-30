@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>メッセージアプリ - ログイン</title>
+  <link rel="stylesheet" href="./style/main.css">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      background-color: #f2f2f7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .login-container {
+      background: white;
+      padding: 2em;
+      border-radius: 1em;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      width: 300px;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.75em;
+      margin-top: 1em;
+      border: 1px solid #ccc;
+      border-radius: 0.5em;
+    }
+
+    button {
+      margin-top: 1em;
+      width: 100%;
+      padding: 0.75em;
+      background-color: #007aff;
+      color: white;
+      border: none;
+      border-radius: 0.5em;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .toggle {
+      margin-top: 1em;
+      text-align: center;
+      color: #007aff;
+      cursor: pointer;
+    }
+
+    .error {
+      color: red;
+      margin-top: 0.5em;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2 id="form-title">ログイン</h2>
+    <input type="text" id="username" placeholder="ユーザー名">
+    <input type="password" id="password" placeholder="パスワード">
+    <button id="submit-btn">ログイン</button>
+    <div class="toggle" id="toggle-mode">新規登録はこちら</div>
+    <div class="error" id="error-msg"></div>
+  </div>
+
+  <script src="./js/login.js"></script>
+</body>
+</html>
