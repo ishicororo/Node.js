@@ -103,6 +103,7 @@ io.on('connection', (socket) => {
   // セッション取得用のラッパー（express-sessionが socket.request.session にある前提）
   const req = socket.request;
   const user = req.session?.user;
+  console.log("🧑 接続ユーザー:", user);
 
   if (!user) {
     socket.disconnect(true);
