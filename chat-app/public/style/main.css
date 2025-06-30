@@ -76,7 +76,7 @@ input[type="text"], input[type="password"] {
 /* チャット画面のフッター */
 footer {
   display: flex;
-  padding: 0.5em 1em;
+  padding: 1em;
   background: white;
   border-top: 1px solid #ccc;
 }
@@ -84,11 +84,10 @@ footer {
 /* テキスト入力欄 */
 input[type="text"] {
   flex: 1;
-  padding: 0.5em 1em;
+  padding: 0.7em;
   border: 1px solid #ccc;
   border-radius: 1em;
   margin-right: 0.5em;
-  font-size: 1em;
 }
 
 /* チャット送信ボタン */
@@ -96,12 +95,10 @@ button {
   background-color: #007aff;
   color: white;
   border: none;
-  padding: 0.5em 0.8em;
+  padding: 0.7em 1em;
   border-radius: 1em;
   font-weight: bold;
   cursor: pointer;
-  font-size: 0.9em;
-  white-space: nowrap;
 }
 
 /* ヘッダー */
