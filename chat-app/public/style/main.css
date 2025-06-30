@@ -1,0 +1,122 @@
+/* ベースフォント */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  background-color: #f2f2f7;
+  margin: 0;
+  padding: 0;
+  color: #000;
+}
+
+/* ログイン画面用コンテナ */
+.login-container {
+  background: white;
+  padding: 2em;
+  border-radius: 1em;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  width: 300px;
+  margin: 10vh auto;
+}
+
+/* ボタン */
+button {
+  background-color: #007aff;
+  color: white;
+  border: none;
+  border-radius: 0.5em;
+  padding: 0.75em;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+}
+
+/* 入力フォーム */
+input[type="text"], input[type="password"] {
+  width: 100%;
+  padding: 0.75em;
+  margin-top: 1em;
+  border: 1px solid #ccc;
+  border-radius: 0.5em;
+}
+
+/* メッセージバブル共通 */
+.message {
+  max-width: 70%;
+  margin: 0.3em 0;
+  padding: 0.7em 1em;
+  border-radius: 1.2em;
+  font-size: 0.9em;
+  position: relative;
+  word-wrap: break-word;
+}
+
+/* 自分のメッセージ（右寄せ青バブル） */
+.message.me {
+  align-self: flex-end;
+  background: #007aff;
+  color: white;
+  border-bottom-right-radius: 0.2em;
+}
+
+/* 他者のメッセージ（左寄せグレーバブル） */
+.message.other {
+  align-self: flex-start;
+  background: #e5e5ea;
+  color: black;
+  border-bottom-left-radius: 0.2em;
+}
+
+/* タイムスタンプ */
+.timestamp {
+  font-size: 0.7em;
+  color: gray;
+  margin-top: 0.2em;
+  text-align: right;
+}
+
+/* チャット画面のフッター */
+footer {
+  display: flex;
+  padding: 1em;
+  background: white;
+  border-top: 1px solid #ccc;
+}
+
+/* テキスト入力欄 */
+input[type="text"] {
+  flex: 1;
+  padding: 0.7em;
+  border: 1px solid #ccc;
+  border-radius: 1em;
+  margin-right: 0.5em;
+}
+
+/* チャット送信ボタン */
+button {
+  background-color: #007aff;
+  color: white;
+  border: none;
+  padding: 0.7em 1em;
+  border-radius: 1em;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* ヘッダー */
+header {
+  background: white;
+  padding: 1em;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.2em;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* チャットエリア */
+#chat-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1em;
+  display: flex;
+  flex-direction: column;
+  background-color: #f2f2f7;
+}
