@@ -72,7 +72,12 @@ app.post('/api/register', async (req, res) => {
 // ─── API: ルーム一覧取得 ────────────────
 app.get('/api/rooms', async (req, res) => {
   const rooms = await fs.readJSON(ROOMS_FILE).catch(() => []);
-  res.json(rooms);
+  users = req.session.user;
+  const userRooms = rooms.filter(room => {
+    if(!rooms.users) return room.createdBy === user;
+    return rooms.users.includes(user);
+  })
+  res.json(userRooms);
 });
 
 // ─── API: ルーム作成 ─────────────────────

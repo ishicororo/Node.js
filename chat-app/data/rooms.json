@@ -1,10 +1,12 @@
 [
   {
     "name": "開明",
-    "createdBy": "Kihira"
+    "createdBy": "Kihira",
+    "users":["Kihira"]
   },
   {
     "name": "家族",
-    "createdBy": "Kihira"
+    "createdBy": "Kihira",
+    "users":["Kihira","龍志"]
   }
 ]
