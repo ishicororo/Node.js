@@ -5,121 +5,147 @@
   <title>メッセージルーム</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      background: #f2f2f7;
-    }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: #f2f2f7;
+  }
 
-    header {
-      background: white;
-      padding: 1em;
-      text-align: center;
-      font-weight: bold;
-      font-size: 1.2em;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
+  header {
+    background: white;
+    padding: 1em;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.2em;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+  }
 
-    #chat-area {
-      flex: 1;
-      overflow-y: auto;
-      padding: 1em;
-      display: flex;
-      flex-direction: column;
-    }
+  #chat-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+  }
 
+  .message-wrapper {
+    display: flex;
+    flex-direction: column;
+    max-width: 80%;
+    margin: 0.5em 1em;
+  }
+
+  .message-wrapper.me {
+    align-self: flex-end;
+    text-align: right;
+  }
+
+  .message-wrapper.other {
+    align-self: flex-start;
+    text-align: left;
+  }
+
+  .username {
+    font-size: 0.75em;
+    color: #555;
+    margin-bottom: 0.2em;
+    font-weight: bold;
+  }
+
+  .message {
+    padding: 0.7em 1em;
+    border-radius: 1.2em;
+    display: inline-block;
+    font-size: 0.9em;
+    word-break: break-word;
+  }
+
+  .message-wrapper.me .message {
+    background-color: #007aff;
+    color: white;
+    border-bottom-right-radius: 0.2em;
+  }
+
+  .message-wrapper.other .message {
+    background-color: #e5e5ea;
+    color: black;
+    border-bottom-left-radius: 0.2em;
+  }
+
+  .timestamp {
+    font-size: 0.7em;
+    color: gray;
+    margin-top: 0.3em;
+  }
+
+  .system-message {
+    text-align: center;
+    color: gray;
+    font-size: 0.8em;
+    margin: 0.5em 0;
+  }
+
+  footer {
+    display: flex;
+    align-items: center;
+    padding: 0.5em 1em;
+    background: white;
+    border-top: 1px solid #ccc;
+  }
+
+  input[type="text"] {
+    flex: 1;
+    padding: 0.5em 1em;
+    border: 1px solid #ccc;
+    border-radius: 1em;
+    margin-right: 0.5em;
+    box-sizing: border-box;
+  }
+
+  footer button {
+    padding: 0.4em 0.7em;
+    font-size: 0.85em;
+    border-radius: 1em;
+    background-color: #007aff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  #logout-btn {
+    position: absolute;
+    right: 1em;
+    top: 1em;
+    background: none;
+    border: none;
+    color: #007aff;
+    font-weight: bold;
+    font-size: 0.9em;
+    cursor: pointer;
+  }
+
+  select {
+    margin: 1em;
+    padding: 0.5em;
+    border-radius: 0.5em;
+  }
+
+  @media (max-width: 600px) {
     .message {
-      max-width: 70%;
-      margin: 0.3em 0;
-      padding: 0.7em 1em;
-      border-radius: 1.2em;
+      font-size: 1.2em;
+    }
+
+    .username {
       font-size: 0.9em;
-      position: relative;
-      display: inline-block;
-    }
-
-    .message.me {
-      align-self: flex-end;
-      background: #007aff;
-      color: white;
-      border-bottom-right-radius: 0.2em;
-      text-align: right;
-    }
-
-    .message.other {
-      align-self: flex-start;
-      background: #e5e5ea;
-      color: black;
-      border-bottom-left-radius: 0.2em;
-      text-align: left;
     }
 
     .timestamp {
-      font-size: 0.7em;
-      color: gray;
-      margin-top: 0.2em;
-      text-align: block;
-    }
-
-    .message.me .timestamp{
-      font-size: 0.7em;
-      color: #f2f2f7;
-      margin-top: 0.2em;
-      text-align: block;
-    }
-
-    footer {
-      display: flex;
-      align-items: center;
-      padding: 0.5em 1em;
-      background: white;
-      border-top: 1px solid #ccc;
-    }
-
-    input[type="text"] {
-      flex: 1;
-      padding: 0.5em 1em;
-      border: 1px solid #ccc;
-      border-radius: 1em;
-      margin-right: 0.5em;
-      box-sizing: border-box;
-    }
-
-    footer button {
-      padding: 0.4em 0.7em;
-      font-size: 0.85em;
-      border-radius: 1em;
-      background-color: #007aff;
-      color: white;
-      border: none;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    #logout-btn {
-      position: absolute;
-      right: 1em;
-      top: 1em;
-      background: none;
-      border: none;
-      color: #007aff;
-      font-weight: bold;
       font-size: 0.9em;
-      cursor: pointer;
-    }
-
-    select {
-      margin: 1em;
-      padding: 0.5em;
-      border-radius: 0.5em;
-    }
-    @media (max-width: 600px) {
-    .message {
-      max-width: 90%;
-      font-size: 1.3em;
     }
 
     footer {
@@ -129,11 +155,11 @@
 
     footer input[type="text"] {
       font-size: 1.3em;
-      height: 5%;
       margin-right: 0;
       margin-bottom: 0.5em;
-      }
-    footer button{
+    }
+
+    footer button {
       width: 100%;
     }
 
@@ -146,8 +172,8 @@
       width: 100%;
       margin: 0.3em 0;
     }
-}
-  </style>
+  }
+</style>
 </head>
 <body>
   <header>メッセージアプリ<button id="logout-btn" style="position:absolute; right:1em; top:1em;">ログアウト</button></header>

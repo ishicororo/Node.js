@@ -126,30 +126,38 @@ inviteBtn.addEventListener('click', async () => {
   }
 });
 function renderMessage({ user: sender, message, timestamp }) {
-  const div = document.createElement('div');
-   if (sender === 'system') {
-    // システムメッセージ（中央表示、灰色）
-    div.className = 'system-message';
-    div.innerHTML = `<em>🔔 ${message}</em>`;
-  } if (sender === 'system') {
-    // システムメッセージ（中央表示、灰色）
-    div.className = 'system-message';
-    div.innerHTML = `<em>🔔 ${message}</em>`;
-  }
-  else{
+  const isSystem = sender === 'system';
   const isMe = sender === currentUser;
 
-  div.classList.add('message');
-  div.classList.add(isMe ? 'me' : 'other');
+  const wrapper = document.createElement('div');
 
-  const time=new Date(timestamp).toLocaleTimeString('ja-JP',{hour: '2-digit', minute: '2-digit' });
+  if (isSystem) {
+    wrapper.className = 'system-message';
+    wrapper.innerHTML = `<em>🔔 ${message}</em>`;
+  } else {
+    wrapper.classList.add('message-wrapper', isMe ? 'me' : 'other');
 
-  div.className = 'message ' + (isMe ? 'me' : 'other');
-  div.innerHTML = `
-    <div>${message}</div>
-    <span class="timestamp">${timestamp}</span>
-  `;
-}
-  chatArea.appendChild(div);
-  div.scrollIntoView();
+    if (!isMe) {
+      const nameElem = document.createElement('div');
+      nameElem.className = 'username';
+      nameElem.textContent = sender;
+      wrapper.appendChild(nameElem);
+    }
+
+    const msgElem = document.createElement('div');
+    msgElem.className = 'message';
+    msgElem.textContent = message;
+    wrapper.appendChild(msgElem);
+
+    const timeElem = document.createElement('div');
+    timeElem.className = 'timestamp';
+    timeElem.textContent = new Date(timestamp).toLocaleTimeString('ja-JP', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    wrapper.appendChild(timeElem);
+  }
+
+  chatArea.appendChild(wrapper);
+  wrapper.scrollIntoView();
 }
