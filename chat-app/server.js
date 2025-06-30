@@ -36,17 +36,6 @@ const USERS_FILE = path.join(DATA_DIR, 'users.json');
 const ROOMS_FILE = path.join(DATA_DIR, 'rooms.json');
 const MESSAGES_DIR = path.join(DATA_DIR, 'messages');
 
-// ─── セッション設定 ─────────────────────
-app.use(session({
-  secret: 'super-secret-key',
-  resave: false,
-  saveUninitialized: false,
-  cookie:{
-    httpOnly:true,
-    maxAge:24 * 60 * 1000
-  }
-}));
-
 // ─── ミドルウェア ─────────────────────
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -134,8 +123,8 @@ io.on('connection', (socket) => {
     const room = rooms.find(r => r.name === roomName);
     if (!room) return;
 
-    if (!room.users || !room.users.includes(user)) {
-      return socket.emit('errorMessage', 'このルームには参加できません');
+    if (!room.users.includes(user)) {
+      room.users.push(user);
     }
 
     socket.join(roomName);
