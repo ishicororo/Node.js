@@ -56,7 +56,6 @@ sendButton.addEventListener('click', () => {
 
   socket.emit('chatMessage', {
     room: currentRoom,
-    user: currentUser || 'あなた',
     message: msg
   });
 
