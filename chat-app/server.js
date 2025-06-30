@@ -73,7 +73,6 @@ app.post('/api/register', async (req, res) => {
 app.get('/api/rooms',requireLogin, async (req, res) => {
   const user=req.session.user;
   const rooms = await fs.readJSON(ROOMS_FILE).catch(() => []);
-  users = req.session.user;
   const userRooms = rooms.filter(room => {
     if(!rooms.users) return room.createdBy === user;
     return rooms.users.includes(user);
@@ -89,7 +88,7 @@ app.post('/api/rooms',requireLogin,async (req, res) => {
     return res.status(400).json({ error: 'ルーム名が既に使われています' });
   }
 
-  const newRoom = { name: roomName, createdBy: req.session.user };
+  const newRoom = { name: roomName, createdBy: req.session.user ,users:[req.session.user]};
   rooms.push(newRoom);
   await fs.writeJSON(ROOMS_FILE, rooms, { spaces: 2 });
   await fs.ensureFile(path.join(MESSAGES_DIR, `${roomName}.json`));
@@ -200,4 +199,4 @@ app.post('/api/rooms/:roomName/add-user', requireLogin, async (req, res) => {
 
   await fs.writeJSON(ROOMS_FILE, rooms, { spaces: 2 });
   res.json({ success: true });
-});
+});newRoom
