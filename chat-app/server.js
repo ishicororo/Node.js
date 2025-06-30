@@ -93,7 +93,7 @@ app.get('/api/rooms',requireLogin, async (req, res) => {
   const user=req.session.user;
   const rooms = await fs.readJSON(ROOMS_FILE).catch(() => []);
   const userRooms = rooms.filter(room => {
-    if(!rooms.users) return room.createdBy === user;
+    if(!room.users) return room.createdBy === user;
     return room.users.includes(user);
   })
   res.json(userRooms);
