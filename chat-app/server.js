@@ -21,7 +21,11 @@ const MESSAGES_DIR = path.join(DATA_DIR, 'messages');
 app.use(session({
   secret: 'super-secret-key',
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie:{
+    httpOnly:true,
+    maxAge:24 * 60 * 1000
+  }
 }));
 
 // ─── ミドルウェア ─────────────────────
