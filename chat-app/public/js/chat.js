@@ -153,25 +153,3 @@ function renderMessage({ user: sender, message, timestamp }) {
   chatArea.appendChild(div);
   div.scrollIntoView();
 }
-const fileInput = document.getElementById('file-input');
-const fileSendButton = document.getElementById('file-send-button');
-
-fileSendButton.addEventListener('click', async () => {
-  if (!fileInput.files.length || !currentRoom) return;
-
-  const formData = new FormData();
-  formData.append('file', fileInput.files[0]);
-  formData.append('room', currentRoom);
-
-  const res = await fetch('/api/upload', {
-    method: 'POST',
-    body: formData
-  });
-
-  const data = await res.json();
-  if (!data.success) {
-    alert('送信に失敗しました');
-  }
-
-  fileInput.value = ''; // 選択解除
-});
