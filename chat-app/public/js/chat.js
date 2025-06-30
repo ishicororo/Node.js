@@ -10,8 +10,13 @@ let currentRoom = null;
 // ユーザーを取得（サーバーにセッションが必要）
 async function fetchUser() {
   // ログイン時にセッションで保存されている前提
-  const res = await fetch('/api/rooms');
-  if (!res.ok) location.href = '/';
+  const res = await fetch('/api/me');
+  if (!res.ok) {
+    location.href = '/';
+    return;
+  }
+  const data = await res.json();
+  currentUser = data.username;
 }
 
 // ルーム一覧取得 & セレクトに追加
@@ -129,7 +134,7 @@ function renderMessage({ user: sender, message, timestamp }) {
   div.classList.add('message');
   div.classList.add(isMe ? 'me' : 'other');
 
-  const time=new Data(timestamp).toLocaleTimeString('ja-JP',{hour: '2-digit', minute: '2-digit' });
+  const time=new Date(timestamp).toLocaleTimeString('ja-JP',{hour: '2-digit', minute: '2-digit' });
 
   div.className = 'message ' + (isMe ? 'me' : 'other');
   div.innerHTML = `
