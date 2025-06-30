@@ -6,10 +6,29 @@ const fs = require('fs-extra');
 const path = require('path');
 const { Server } = require('socket.io');
 const http = require('http');
+const sharedSession = require('express-socket.io-session');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+
+//─── セッションミドルウェア設定 ─────────────────────
+const sessionMiddleware = session({
+  secret: 'super-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000
+  }
+});
+
+app.use(sessionMiddleware);
+
+// ←ここでセッションをSocket.IOにも共有
+io.use(sharedSession(sessionMiddleware, {
+  autoSave: true
+}));
 
 // ─── ディレクトリ設定 ─────────────────────
 const DATA_DIR = path.join(__dirname, 'data');
