@@ -75,7 +75,7 @@ app.get('/api/rooms',requireLogin, async (req, res) => {
   const rooms = await fs.readJSON(ROOMS_FILE).catch(() => []);
   const userRooms = rooms.filter(room => {
     if(!rooms.users) return room.createdBy === user;
-    return rooms.users.includes(user);
+    return room.users.includes(user);
   })
   res.json(userRooms);
 });
@@ -199,4 +199,4 @@ app.post('/api/rooms/:roomName/add-user', requireLogin, async (req, res) => {
 
   await fs.writeJSON(ROOMS_FILE, rooms, { spaces: 2 });
   res.json({ success: true });
-});newRoom
+});
