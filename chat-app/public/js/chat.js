@@ -108,3 +108,8 @@ document.getElementById('create-room-btn').addEventListener('click', async () =>
     alert(data.error || 'ルーム作成に失敗しました');
   }
 });
+
+document.getElementById('logout-btn').addEventListener('click', async () => {
+  await fetch('/api/logout', { method: 'POST' });
+  location.href = '/';
+});

@@ -139,8 +139,3 @@ app.post('/api/logout', (req, res) => {
     res.json({ success: true });
   });
 });
-
-document.getElementById('logout-btn').addEventListener('click', async () => {
-  await fetch('/api/logout', { method: 'POST' });
-  location.href = '/';
-});
