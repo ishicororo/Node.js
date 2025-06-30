@@ -113,3 +113,28 @@ document.getElementById('logout-btn').addEventListener('click', async () => {
   await fetch('/api/logout', { method: 'POST' });
   location.href = '/';
 });
+const inviteBtn = document.getElementById('invite-btn');
+const inviteInput = document.getElementById('invite-username');
+
+inviteBtn.addEventListener('click', async () => {
+  const username = inviteInput.value.trim();
+  if (!username || !currentRoom) {
+    alert('ユーザー名とルームが必要です');
+    return;
+  }
+
+  const res = await fetch(`/api/rooms/${currentRoom}/add-user`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ username })
+  });
+
+  const result = await res.json();
+  if (res.ok) {
+    alert(`${username} をルームに追加しました`);
+    inviteInput.value = '';
+  } else {
+    alert(result.error || '追加に失敗しました');
+  }
+});

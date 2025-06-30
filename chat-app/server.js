@@ -143,3 +143,36 @@ app.post('/api/logout', (req, res) => {
     res.json({ success: true });
   });
 });
+
+// ユーザーをルームに追加
+app.post('/api/rooms/:roomName/add-user', requireLogin, async (req, res) => {
+  const { roomName } = req.params;
+  const { username } = req.body;
+
+  const users = await fs.readJSON(USERS_FILE).catch(() => []);
+  const rooms = await fs.readJSON(ROOMS_FILE).catch(() => []);
+
+  const room = rooms.find(r => r.name === roomName);
+  if (!room) return res.status(404).json({ error: 'ルームが存在しません' });
+
+  // 招待できるのは作成者だけに制限する場合：
+  if (room.createdBy !== req.session.user) {
+    return res.status(403).json({ error: 'この操作は許可されていません' });
+  }
+
+  // ユーザーが存在するか？
+  const userExists = users.some(u => u.username === username);
+  if (!userExists) return res.status(400).json({ error: 'ユーザーが存在しません' });
+
+  // 初回なら users フィールドを作る
+  if (!room.users) room.users = [room.createdBy];
+
+  if (!room.users.includes(username)) {
+    room.users.push(username);
+  } else {
+    return res.status(400).json({ error: '既に追加されています' });
+  }
+
+  await fs.writeJSON(ROOMS_FILE, rooms, { spaces: 2 });
+  res.json({ success: true });
+});
