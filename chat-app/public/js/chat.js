@@ -128,6 +128,16 @@ inviteBtn.addEventListener('click', async () => {
 });
 function renderMessage({ user: sender, message, timestamp }) {
   const div = document.createElement('div');
+   if (sender === 'system') {
+    // システムメッセージ（中央表示、灰色）
+    div.className = 'system-message';
+    div.innerHTML = `<em>🔔 ${message}</em>`;
+  } if (sender === 'system') {
+    // システムメッセージ（中央表示、灰色）
+    div.className = 'system-message';
+    div.innerHTML = `<em>🔔 ${message}</em>`;
+  }
+  else{
   const isMe = sender === currentUser;
 
   div.classList.add('message');
@@ -140,7 +150,7 @@ function renderMessage({ user: sender, message, timestamp }) {
     <div>${message}</div>
     <span class="timestamp">${timestamp}</span>
   `;
-
+}
   chatArea.appendChild(div);
   div.scrollIntoView();
 }
