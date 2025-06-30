@@ -53,7 +53,6 @@ function joinRoom(room) {
 sendButton.addEventListener('click', () => {
   const msg = input.value.trim();
   if (!msg || !currentRoom) return;
-
   socket.emit('chatMessage', {
     room: currentRoom,
     message: msg
