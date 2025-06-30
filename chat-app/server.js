@@ -72,7 +72,7 @@ app.get('/api/rooms', async (req, res) => {
 });
 
 // ─── API: ルーム作成 ─────────────────────
-app.post('/api/rooms', async (req, res) => {
+app.post('/api/rooms',requireLogin,async (req, res) => {
   const { roomName } = req.body;
   let rooms = await fs.readJSON(ROOMS_FILE).catch(() => []);
   if (rooms.find(r => r.name === roomName)) {
@@ -115,4 +115,32 @@ io.on('connection', (socket) => {
 const PORT = 3000;
 server.listen(PORT, () => {
   console.log(`🚀 サーバー起動中: http://localhost:${PORT}`);
+});
+// チャット画面の認証チェック
+app.get('/chat.html', (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/');
+  }
+  res.sendFile(path.join(__dirname, 'public/chat.html'));
+});
+
+// APIなどでも使いたい場合に再利用しやすくするなら:
+function requireLogin(req, res, next) {
+  if (!req.session.user) return res.status(401).json({ error: 'ログインが必要です' });
+  next();
+}
+
+app.get('/api/me', requireLogin, (req, res) => {
+  res.json({ username: req.session.user });
+});
+
+app.post('/api/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.json({ success: true });
+  });
+});
+
+document.getElementById('logout-btn').addEventListener('click', async () => {
+  await fetch('/api/logout', { method: 'POST' });
+  location.href = '/';
 });
