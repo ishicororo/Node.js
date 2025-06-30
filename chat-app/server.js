@@ -218,3 +218,21 @@ app.post('/api/rooms/:roomName/add-user', requireLogin, async (req, res) => {
   await fs.writeJSON(ROOMS_FILE, rooms, { spaces: 2 });
   res.json({ success: true });
 });
+const multer = require('multer');
+const UPLOAD_DIR = path.join(__dirname, 'public/uploads');
+fs.ensureDirSync(UPLOAD_DIR);
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, UPLOAD_DIR),
+  filename: (req, file, cb) => {
+    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, unique + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage });
+
+app.post('/upload', requireLogin, upload.single('file'), (req, res) => {
+  const fileUrl = `/uploads/${req.file.filename}`;
+  res.json({ url: fileUrl });
+});
