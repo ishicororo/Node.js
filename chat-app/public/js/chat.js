@@ -60,31 +60,15 @@ sendButton.addEventListener('click', () => {
 
 // 過去ログ表示
 socket.on('chatHistory', (messages) => {
-  messages.forEach(showMessage);
+  messages.forEach(renderMessage);
 });
 
 // 新着メッセージ表示
-socket.on('newMessage', showMessage);
-
-function showMessage({ user, message, timestamp }) {
-  const div = document.createElement('div');
-  const time = new Date(timestamp).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
-
-  div.classList.add('message');
-  div.classList.add(user === currentUser ? 'me' : 'other');
-  div.innerHTML = `
-    ${message}
-    <div class="timestamp">${time}</div>
-  `;
-
-  chatArea.appendChild(div);
-  chatArea.scrollTop = chatArea.scrollHeight;
-}
+socket.on('newMessage', renderMessage);
 
 // 初期化
 (async () => {
   await fetchUser();
-  currentUser = 'あなた'; // ※将来的にユーザー名をセッションから取得
   await loadRooms();
 })();
 
@@ -138,3 +122,21 @@ inviteBtn.addEventListener('click', async () => {
     alert(result.error || '追加に失敗しました');
   }
 });
+function renderMessage({ user: sender, message, timestamp }) {
+  const div = document.createElement('div');
+  const isMe = sender === currentUser;
+
+  div.classList.add('message');
+  div.classList.add(isMe ? 'me' : 'other');
+
+  const time=new Data(timestamp).toLocaleTimeString('ja-JP',{hour: '2-digit', minute: '2-digit' });
+
+  div.className = 'message ' + (isMe ? 'me' : 'other');
+  div.innerHTML = `
+    <div>${message}</div>
+    <span class="timestamp">${timestamp}</span>
+  `;
+
+  chatArea.appendChild(div);
+  div.scrollIntoView();
+}
