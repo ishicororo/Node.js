@@ -123,8 +123,11 @@ io.on('connection', (socket) => {
     const room = rooms.find(r => r.name === roomName);
     if (!room) return;
 
+    if(!room.users) room.users = [room.createdBy];
+
     if (!room.users.includes(user)) {
       room.users.push(user);
+      await fs.writeJSON(ROOMS_FILE, rooms, {spaces: 2 });
     }
 
     socket.join(roomName);
