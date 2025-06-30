@@ -136,6 +136,11 @@ io.on('connection', (socket) => {
     const msgFile = path.join(MESSAGES_DIR, `${roomName}.json`);
     const messages = await fs.readJSON(msgFile).catch(() => []);
     socket.emit('chatHistory', messages);
+    io.to(roomName).emit('newMessage', {
+    user: 'system',
+    message: `${user} が参加しました`,
+    timestamp: new Date().toLocaleString()
+  });
   });
 
   socket.on('chatMessage', async ({ room, message }) => {
