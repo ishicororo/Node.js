@@ -84,7 +84,8 @@ app.get('/api/rooms',requireLogin, async (req, res) => {
   const userRooms = rooms.filter(room => {
     if(!room.users) return room.createdBy === user;
     return room.users.includes(user);
-  })
+  });
+  console.log('ユーザー参加ルーム：',userRooms)
   res.json(userRooms);
 });
 
