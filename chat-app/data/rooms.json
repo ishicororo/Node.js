@@ -22,5 +22,12 @@
       "Shimarintantei",
       "Kihira"
     ]
+  },
+  {
+    "name": "中学2年生",
+    "createdBy": "Kihira",
+    "users": [
+      "Kihira"
+    ]
   }
 ]

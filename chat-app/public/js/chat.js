@@ -47,6 +47,7 @@ roomSelector.addEventListener('change', () => {
 function joinRoom(room) {
   socket.emit('joinRoom', room);
   chatArea.innerHTML = '';
+  loadRooms();
 }
 
 // メッセージ送信
@@ -65,6 +66,7 @@ sendButton.addEventListener('click', () => {
 // 過去ログ表示
 socket.on('chatHistory', (messages) => {
   messages.forEach(renderMessage);
+  loadRooms();
 });
 
 // 新着メッセージ表示
