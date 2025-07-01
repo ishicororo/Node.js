@@ -198,7 +198,6 @@ saveSettingsBtn.addEventListener('click', async () => {
     return;
   }
 
-  // ここでAPI呼び出し例（実装に合わせて調整ください）
   try {
     const res = await fetch('/api/user/update', {
       method: 'POST',
@@ -206,7 +205,19 @@ saveSettingsBtn.addEventListener('click', async () => {
       body: JSON.stringify({ newUsername, newPassword }),
       credentials: 'include',
     });
-    const data = await res.json();
+
+    const text = await res.text();
+    console.log('🧾 レスポンステキスト:', text);
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error('❌ JSON解析エラー:', e, text);
+      alert('サーバーから不正なレスポンス');
+      return;
+    }
+
     if (res.ok) {
       alert('ユーザー設定を更新しました');
       updateUserNameDisplay(newUsername);
@@ -215,6 +226,7 @@ saveSettingsBtn.addEventListener('click', async () => {
       alert(data.error || '更新に失敗しました');
     }
   } catch (err) {
+    console.error('❌ 通信エラー:', err);
     alert('通信エラーが発生しました');
   }
 });

@@ -284,6 +284,7 @@ app.post('/api/user/update', requireLogin, async (req, res) => {
 });
 app.post('/api/user/delete', requireLogin, async (req, res) => {
   const username = req.session.user;
+  console.log('🗑️ アカウント削除リクエスト:', username);
 
   let users = await fs.readJSON(USERS_FILE).catch(() => []);
   users = users.filter(u => u.username !== username);
