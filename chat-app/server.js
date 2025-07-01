@@ -218,7 +218,6 @@ app.post('/api/rooms/:roomName/add-user', requireLogin, async (req, res) => {
   await fs.writeJSON(ROOMS_FILE, rooms, { spaces: 2 });
   res.json({ success: true });
 });
-// ユーザー名とパスワードの更新
 app.post('/api/user/update', requireLogin, async (req, res) => {
   const { newUsername, newPassword } = req.body;
   const currentUsername = req.session.user;
@@ -229,12 +228,10 @@ app.post('/api/user/update', requireLogin, async (req, res) => {
     return res.status(404).json({ error: 'ユーザーが見つかりません' });
   }
 
-  // もし新しいユーザー名が既存ユーザーと重複していたらエラー（自分以外）
   if (newUsername !== currentUsername && users.some(u => u.username === newUsername)) {
     return res.status(400).json({ error: 'そのユーザー名は既に使われています' });
   }
 
-  // 更新
   users[userIndex].username = newUsername;
 
   if (newPassword) {
@@ -244,7 +241,7 @@ app.post('/api/user/update', requireLogin, async (req, res) => {
 
   await fs.writeJSON(USERS_FILE, users, { spaces: 2 });
 
-  // ルームに参加してる名前も更新
+  // ルーム関連のユーザー名更新
   let rooms = await fs.readJSON(ROOMS_FILE).catch(() => []);
   for (const room of rooms) {
     if (room.createdBy === currentUsername) {
@@ -257,7 +254,7 @@ app.post('/api/user/update', requireLogin, async (req, res) => {
   }
   await fs.writeJSON(ROOMS_FILE, rooms, { spaces: 2 });
 
-  // メッセージ履歴内の送信者名も更新（オプション）
+  // メッセージ履歴も更新
   const files = await fs.readdir(MESSAGES_DIR);
   for (const file of files) {
     const filePath = path.join(MESSAGES_DIR, file);
@@ -274,19 +271,23 @@ app.post('/api/user/update', requireLogin, async (req, res) => {
     }
   }
 
+  // セッション更新と保存
   req.session.user = newUsername;
-  res.json({ success: true });
+  req.session.save(err => {
+    if (err) {
+      console.error('セッション保存エラー:', err);
+      return res.status(500).json({ error: 'セッション保存に失敗しました' });
+    }
+    res.json({ success: true });
+  });
 });
-// アカウント削除
 app.post('/api/user/delete', requireLogin, async (req, res) => {
   const username = req.session.user;
 
-  // ユーザー削除
   let users = await fs.readJSON(USERS_FILE).catch(() => []);
   users = users.filter(u => u.username !== username);
   await fs.writeJSON(USERS_FILE, users, { spaces: 2 });
 
-  // 参加中のルームから除外 or 作成ルームを削除
   let rooms = await fs.readJSON(ROOMS_FILE).catch(() => []);
   rooms = rooms.filter(room => room.createdBy !== username);
   for (const room of rooms) {
@@ -296,10 +297,13 @@ app.post('/api/user/delete', requireLogin, async (req, res) => {
   }
   await fs.writeJSON(ROOMS_FILE, rooms, { spaces: 2 });
 
-  // メッセージも削除 or 匿名化（今回は削除しない）
-  // （必要があれば削除コード追加）
-
-  req.session.destroy(() => {
+  // セッション破棄 + Cookieクリア
+  req.session.destroy(err => {
+    if (err) {
+      console.error('セッション破棄失敗:', err);
+      return res.status(500).json({ error: 'ログアウトに失敗しました' });
+    }
+    res.clearCookie('connect.sid');
     res.json({ success: true });
   });
 });

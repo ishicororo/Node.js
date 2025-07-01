@@ -168,8 +168,7 @@ const closeSettingsBtn = document.getElementById('close-settings-btn');
 const saveSettingsBtn = document.getElementById('save-settings-btn');
 const deleteAccountBtn = document.getElementById('delete-account-btn');
 
-
-// ログイン後にユーザー名表示をセット
+// ユーザー名表示をセットする関数
 function updateUserNameDisplay(name) {
   currentUser = name;
   userNameDisplay.textContent = name;
@@ -178,17 +177,16 @@ function updateUserNameDisplay(name) {
 // ユーザー名表示クリックでモーダル表示
 userNameDisplay.addEventListener('click', () => {
   userSettingsModal.style.display = 'flex';
-  // もし必要なら初期値セット
   document.getElementById('new-username').value = currentUser;
   document.getElementById('new-password').value = '';
 });
 
-// モーダル閉じる
+// モーダルを閉じる
 closeSettingsBtn.addEventListener('click', () => {
   userSettingsModal.style.display = 'none';
 });
 
-// 設定保存（例：APIに送信）
+// ユーザー設定保存
 saveSettingsBtn.addEventListener('click', async () => {
   const newUsername = document.getElementById('new-username').value.trim();
   const newPassword = document.getElementById('new-password').value.trim();
@@ -198,7 +196,6 @@ saveSettingsBtn.addEventListener('click', async () => {
     return;
   }
 
-  // ここでAPI呼び出し例（実装に合わせて調整ください）
   try {
     const res = await fetch('/api/user/update', {
       method: 'POST',
@@ -207,19 +204,28 @@ saveSettingsBtn.addEventListener('click', async () => {
       credentials: 'include',
     });
     const data = await res.json();
+
     if (res.ok) {
       alert('ユーザー設定を更新しました');
       updateUserNameDisplay(newUsername);
       userSettingsModal.style.display = 'none';
+
+      // もしSocket.IOを使ってる場合は再接続
+      if (typeof socket !== 'undefined') {
+        socket.disconnect();
+        socket.connect();
+      }
+
     } else {
       alert(data.error || '更新に失敗しました');
     }
   } catch (err) {
     alert('通信エラーが発生しました');
+    console.error(err);
   }
 });
 
-// アカウント削除（要確認ダイアログ）
+// アカウント削除
 deleteAccountBtn.addEventListener('click', async () => {
   if (!confirm('本当にアカウントを削除しますか？この操作は取り消せません。')) return;
 
@@ -236,12 +242,13 @@ deleteAccountBtn.addEventListener('click', async () => {
     }
   } catch (err) {
     alert('通信エラーが発生しました');
+    console.error(err);
   }
 });
-// ログインユーザー名を表示
+
+// ページ読み込み時にログインユーザー名を取得・表示
 document.addEventListener('DOMContentLoaded', () => {
-  const userDisplay = document.getElementById('user-name-display');
-  userDisplay.textContent = 'ログイン中…'; // 初期表示
+  userNameDisplay.textContent = 'ログイン中...';
 
   fetch('/api/me', { credentials: 'include' })
     .then(res => {
@@ -250,13 +257,13 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .then(data => {
       if (data.username) {
-        userDisplay.textContent = data.username;
+        updateUserNameDisplay(data.username); // ← 共通化
       } else {
-        userDisplay.textContent = '未ログイン';
+        userNameDisplay.textContent = '未ログイン';
       }
     })
     .catch(err => {
       console.error('ユーザー名取得失敗:', err);
-      userDisplay.textContent = '通信エラー';
+      userNameDisplay.textContent = '通信エラー';
     });
 });
