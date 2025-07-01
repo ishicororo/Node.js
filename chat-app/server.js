@@ -218,3 +218,92 @@ app.post('/api/rooms/:roomName/add-user', requireLogin, async (req, res) => {
   await fs.writeJSON(ROOMS_FILE, rooms, { spaces: 2 });
   res.json({ success: true });
 });
+// ユーザー名とパスワードの更新
+app.post('/api/user/update', requireLogin, async (req, res) => {
+  const { newUsername, newPassword } = req.body;
+  const currentUsername = req.session.user;
+
+  let users = await fs.readJSON(USERS_FILE).catch(() => []);
+  const userIndex = users.findIndex(u => u.username === currentUsername);
+  if (userIndex === -1) {
+    return res.status(404).json({ error: 'ユーザーが見つかりません' });
+  }
+
+  // もし新しいユーザー名が既存ユーザーと重複していたらエラー（自分以外）
+  if (newUsername !== currentUsername && users.some(u => u.username === newUsername)) {
+    return res.status(400).json({ error: 'そのユーザー名は既に使われています' });
+  }
+
+  // 更新
+  users[userIndex].username = newUsername;
+
+  if (newPassword) {
+    const hash = await bcrypt.hash(newPassword, 10);
+    users[userIndex].password = hash;
+  }
+
+  await fs.writeJSON(USERS_FILE, users, { spaces: 2 });
+
+  // ルームに参加してる名前も更新
+  let rooms = await fs.readJSON(ROOMS_FILE).catch(() => []);
+  for (const room of rooms) {
+    if (room.createdBy === currentUsername) {
+      room.createdBy = newUsername;
+    }
+    if (room.users) {
+      const i = room.users.indexOf(currentUsername);
+      if (i !== -1) room.users[i] = newUsername;
+    }
+  }
+  await fs.writeJSON(ROOMS_FILE, rooms, { spaces: 2 });
+
+  // メッセージ履歴内の送信者名も更新（オプション）
+  const files = await fs.readdir(MESSAGES_DIR);
+  for (const file of files) {
+    const filePath = path.join(MESSAGES_DIR, file);
+    let messages = await fs.readJSON(filePath).catch(() => []);
+    let updated = false;
+    for (let msg of messages) {
+      if (msg.user === currentUsername) {
+        msg.user = newUsername;
+        updated = true;
+      }
+    }
+    if (updated) {
+      await fs.writeJSON(filePath, messages, { spaces: 2 });
+    }
+  }
+
+  req.session.user = newUsername;
+  res.json({ success: true });
+});
+// アカウント削除
+app.post('/api/user/delete', requireLogin, async (req, res) => {
+  const username = req.session.user;
+
+  // ユーザー削除
+  let users = await fs.readJSON(USERS_FILE).catch(() => []);
+  users = users.filter(u => u.username !== username);
+  await fs.writeJSON(USERS_FILE, users, { spaces: 2 });
+
+  // 参加中のルームから除外 or 作成ルームを削除
+  let rooms = await fs.readJSON(ROOMS_FILE).catch(() => []);
+  rooms = rooms.filter(room => room.createdBy !== username);
+  for (const room of rooms) {
+    if (room.users) {
+      room.users = room.users.filter(u => u !== username);
+    }
+  }
+  await fs.writeJSON(ROOMS_FILE, rooms, { spaces: 2 });
+
+  // メッセージも削除 or 匿名化（今回は削除しない）
+  // （必要があれば削除コード追加）
+
+  req.session.destroy(() => {
+    res.json({ success: true });
+  });
+});
+function requireLogin(req, res, next) {
+  if (!req.session.user) return res.status(401).json({ error: 'ログインが必要です' });
+  next();
+}

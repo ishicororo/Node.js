@@ -1,8 +1,33 @@
-[{
+[
+  {
     "name": "中学生",
     "createdBy": "Shimarintantei",
     "users": [
       "Shimarintantei",
       "Kihira"
     ]
-  }]
+  },
+  {
+    "name": "お菓子は美味しいの",
+    "createdBy": "Kihira",
+    "users": [
+      "Kihira",
+      "sena"
+    ]
+  },
+  {
+    "name": "テスト",
+    "createdBy": "Kihira",
+    "users": [
+      "Kihira"
+    ]
+  },
+  {
+    "name": "家族",
+    "createdBy": "Kihira",
+    "users": [
+      "Kihira",
+      "kayo"
+    ]
+  }
+]

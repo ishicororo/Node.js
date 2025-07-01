@@ -161,3 +161,91 @@ function renderMessage({ user: sender, message, timestamp }) {
   chatArea.appendChild(wrapper);
   wrapper.scrollIntoView();
 }
+// ユーザー名表示とモーダル要素取得
+const userNameDisplay = document.getElementById('user-name-display');
+const userSettingsModal = document.getElementById('user-settings-modal');
+const closeSettingsBtn = document.getElementById('close-settings-btn');
+const saveSettingsBtn = document.getElementById('save-settings-btn');
+const deleteAccountBtn = document.getElementById('delete-account-btn');
+
+
+// ログイン後にユーザー名表示をセット
+function updateUserNameDisplay(name) {
+  currentUser = name;
+  userNameDisplay.textContent = name;
+}
+
+// ユーザー名表示クリックでモーダル表示
+userNameDisplay.addEventListener('click', () => {
+  userSettingsModal.style.display = 'flex';
+  // もし必要なら初期値セット
+  document.getElementById('new-username').value = currentUser;
+  document.getElementById('new-password').value = '';
+});
+
+// モーダル閉じる
+closeSettingsBtn.addEventListener('click', () => {
+  userSettingsModal.style.display = 'none';
+});
+
+// 設定保存（例：APIに送信）
+saveSettingsBtn.addEventListener('click', async () => {
+  const newUsername = document.getElementById('new-username').value.trim();
+  const newPassword = document.getElementById('new-password').value.trim();
+
+  if (!newUsername) {
+    alert('ユーザー名は空にできません');
+    return;
+  }
+
+  // ここでAPI呼び出し例（実装に合わせて調整ください）
+  try {
+    const res = await fetch('/api/user/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ newUsername, newPassword }),
+      credentials: 'include',
+    });
+    const data = await res.json();
+    if (res.ok) {
+      alert('ユーザー設定を更新しました');
+      updateUserNameDisplay(newUsername);
+      userSettingsModal.style.display = 'none';
+    } else {
+      alert(data.error || '更新に失敗しました');
+    }
+  } catch (err) {
+    alert('通信エラーが発生しました');
+  }
+});
+
+// アカウント削除（要確認ダイアログ）
+deleteAccountBtn.addEventListener('click', async () => {
+  if (!confirm('本当にアカウントを削除しますか？この操作は取り消せません。')) return;
+
+  try {
+    const res = await fetch('/api/user/delete', {
+      method: 'POST',
+      credentials: 'include',
+    });
+    if (res.ok) {
+      alert('アカウントを削除しました。ログアウトします。');
+      location.href = '/';
+    } else {
+      alert('削除に失敗しました');
+    }
+  } catch (err) {
+    alert('通信エラーが発生しました');
+  }
+});
+// ユーザー名を取得して表示
+fetch('/api/me')
+  .then(res => res.json())
+  .then(data => {
+    if (data.username) {
+      document.getElementById('user-name-display').textContent = data.username;
+    }
+  })
+  .catch(err => {
+    console.error('ユーザー名取得失敗:', err);
+  });

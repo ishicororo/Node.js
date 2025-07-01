@@ -176,7 +176,13 @@
 </style>
 </head>
 <body>
-  <header>メッセージアプリ<button id="logout-btn" style="position:absolute; right:1em; top:1em;">ログアウト</button></header>
+  <header>
+    メッセージアプリ
+    <button id="logout-btn" style="position:absolute; right:1em; top:1em;">ログアウト</button>
+      <div id="user-name-display" style="position:absolute; left:1em; top:1em; cursor:pointer; font-weight:bold; color:#007aff;">
+    ユーザー名
+      </div>
+  </header>
 
   <select id="room-selector"></select>
   <button id="create-room-btn" style="margin-left: 1em; padding: 0.5em 1em; border-radius: 0.5em; background-color: #34c759; color: white; border: none; cursor: pointer;">
@@ -195,6 +201,31 @@
     <input type="text" id="message-input" placeholder="メッセージを入力...">
     <button id="send-button">送信</button>
   </footer>
+  <!-- ユーザー設定モーダル -->
+  <div id="user-settings-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.4); justify-content:center; align-items:center;">
+    <div style="background:white; padding:1.5em; border-radius:1em; max-width:400px; width:90%; position:relative;">
+      <button id="close-settings-btn" style="position:absolute; top:0.5em; right:0.5em; background:none; border:none; font-size:1.2em; cursor:pointer;">×</button>
+      <h2>ユーザー設定</h2>
+
+      <label>
+      ユーザー名変更:<br>
+      <input type="text" id="new-username" placeholder="新しいユーザー名" style="width:100%; padding:0.5em; margin-top:0.3em; margin-bottom:1em;">
+      </label>
+
+      <label>
+      パスワード変更:<br>
+      <input type="password" id="new-password" placeholder="新しいパスワード" style="width:100%; padding:0.5em; margin-top:0.3em; margin-bottom:1em;">
+      </label>
+
+      <button id="save-settings-btn" style="background:#007aff; color:white; border:none; padding:0.6em 1.2em; border-radius:0.5em; cursor:pointer;">保存</button>
+
+      <hr style="margin:1em 0;">
+
+      <button id="delete-account-btn" style="background:#ff3b30; color:white; border:none; padding:0.6em 1.2em; border-radius:0.5em; cursor:pointer;">
+        アカウント削除（注意）
+      </button>
+    </div>
+  </div>
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="./js/chat.js"></script>
