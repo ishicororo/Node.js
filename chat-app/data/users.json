@@ -30,5 +30,9 @@
   {
     "username": "kayo",
     "password": "$2b$10$8kQ6kZYp8.fmq8pqguwkwe8y7EkGmunNYN/Qw7AuEmBQtdGgh2s3W"
+  },
+  {
+    "username": "Test",
+    "password": "$2b$10$fwYdKqleopNNXcXpyVnxcO5082qyfcBgn9wHPDOw1ol1CXZmt2xMO"
   }
 ]

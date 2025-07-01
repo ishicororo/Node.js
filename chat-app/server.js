@@ -303,7 +303,3 @@ app.post('/api/user/delete', requireLogin, async (req, res) => {
     res.json({ success: true });
   });
 });
-function requireLogin(req, res, next) {
-  if (!req.session.user) return res.status(401).json({ error: 'ログインが必要です' });
-  next();
-}
