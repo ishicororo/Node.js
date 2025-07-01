@@ -238,14 +238,25 @@ deleteAccountBtn.addEventListener('click', async () => {
     alert('通信エラーが発生しました');
   }
 });
-// ユーザー名を取得して表示
-fetch('/api/me')
-  .then(res => res.json())
-  .then(data => {
-    if (data.username) {
-      document.getElementById('user-name-display').textContent = data.username;
-    }
-  })
-  .catch(err => {
-    console.error('ユーザー名取得失敗:', err);
-  });
+// ログインユーザー名を表示
+document.addEventListener('DOMContentLoaded', () => {
+  const userDisplay = document.getElementById('user-name-display');
+  userDisplay.textContent = 'ログイン中…'; // 初期表示
+
+  fetch('/api/me', { credentials: 'include' })
+    .then(res => {
+      if (!res.ok) throw new Error('HTTPエラー');
+      return res.json();
+    })
+    .then(data => {
+      if (data.username) {
+        userDisplay.textContent = data.username;
+      } else {
+        userDisplay.textContent = '未ログイン';
+      }
+    })
+    .catch(err => {
+      console.error('ユーザー名取得失敗:', err);
+      userDisplay.textContent = '通信エラー';
+    });
+});
