@@ -219,6 +219,7 @@ app.post('/api/rooms/:roomName/add-user', requireLogin, async (req, res) => {
   res.json({ success: true });
 });
 app.post('/api/user/update', requireLogin, async (req, res) => {
+  console.log('現在ログイン中:', req.session.user);
   const { newUsername, newPassword } = req.body;
   const currentUsername = req.session.user;
 
