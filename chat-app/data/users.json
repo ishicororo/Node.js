@@ -34,5 +34,9 @@
   {
     "username": "Test",
     "password": "$2b$10$fwYdKqleopNNXcXpyVnxcO5082qyfcBgn9wHPDOw1ol1CXZmt2xMO"
+  },
+  {
+    "username": "理央",
+    "password": "$2b$10$FAQmCJGihsMOM4WG5bR1B.weBuT.A4HDjLjbXrAxHAsRm/aU0gTu2"
   }
 ]
