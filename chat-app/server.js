@@ -198,7 +198,6 @@ app.post('/api/rooms/:roomName/add-user', requireLogin, async (req, res) => {
   const room = rooms.find(r => r.name === roomName);
   if (!room) return res.status(404).json({ error: 'ルームが存在しません' });
 
-  // 招待できるのは作成者だけに制限する場合：
   if (!room.users.includes(req.session.user)) {
     return res.status(403).json({ error: 'この操作は許可されていません' });
   }
