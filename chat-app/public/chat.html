@@ -134,6 +134,21 @@
     padding: 0.5em;
     border-radius: 0.5em;
   }
+  .modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0,0,0,0.6);
+  z-index: 1000;
+}
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  min-width: 300px;
+}
 
   @media (max-width: 600px) {
     .message {
@@ -182,6 +197,8 @@
       <div id="user-name-display" style="position:absolute; left:1em; top:1em; cursor:pointer; font-weight:bold; color:#007aff;">
     ユーザー名
       </div>
+      <!-- ボタン（右上などに設置） -->
+<button id="open-group-settings-btn">⚙️ グループ設定</button>
   </header>
 
   <select id="room-selector"></select>
@@ -226,6 +243,22 @@
       </button>
     </div>
   </div>
+  <!-- グループ設定モーダル -->
+<div id="group-settings-modal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <h2>グループ設定</h2>
+    <ul id="member-list"></ul>
+
+    <div id="admin-actions" style="display: none;">
+      <input type="text" id="invite-username" placeholder="ユーザー名を追加" />
+      <button id="invite-btn">追加</button>
+      <button id="delete-room-btn">ルームを削除</button>
+    </div>
+
+    <button id="leave-room-btn">このルームから離脱</button>
+    <button id="close-group-settings">閉じる</button>
+  </div>
+</div>
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="./js/chat.js"></script>

@@ -98,7 +98,12 @@ app.post('/api/rooms',requireLogin,async (req, res) => {
     return res.status(400).json({ error: 'ルーム名が既に使われています' });
   }
 
-  const newRoom = { name: roomName, createdBy: req.session.user ,users:[req.session.user]};
+  const newRoom = {
+     name: roomName,
+     createdBy: req.session.user ,
+     users:[req.session.user],
+     admins: [req.session.user],
+    };
   rooms.push(newRoom);
   await fs.writeJSON(ROOMS_FILE, rooms, { spaces: 2 });
   await fs.ensureFile(path.join(MESSAGES_DIR, `${roomName}.json`));
@@ -308,4 +313,69 @@ app.post('/api/user/delete', requireLogin, async (req, res) => {
     res.clearCookie('connect.sid');
     res.json({ success: true });
   });
+});
+function isAdmin(user, room) {
+  return room.admins && room.admins.includes(user);
+}
+app.post('/api/rooms/:roomName/delete', requireLogin, async (req, res) => {
+  const { roomName } = req.params;
+  const rooms = await fs.readJSON(ROOMS_FILE).catch(() => []);
+  const room = rooms.find(r => r.name === roomName);
+
+  if (!room) return res.status(404).json({ error: 'ルームが見つかりません' });
+
+  if (!isAdmin(req.session.user, room)) {
+    return res.status(403).json({ error: '管理者権限がありません' });
+  }
+
+  const updatedRooms = rooms.filter(r => r.name !== roomName);
+  await fs.writeJSON(ROOMS_FILE, updatedRooms, { spaces: 2 });
+
+  const msgFile = path.join(MESSAGES_DIR, `${roomName}.json`);
+  await fs.remove(msgFile).catch(() => {});
+
+  res.json({ success: true });
+});
+app.post('/api/rooms/:roomName/add-admin', requireLogin, async (req, res) => {
+  const { roomName } = req.params;
+  const { username } = req.body;
+
+  const rooms = await fs.readJSON(ROOMS_FILE).catch(() => []);
+  const room = rooms.find(r => r.name === roomName);
+  if (!room) return res.status(404).json({ error: 'ルームが見つかりません' });
+
+  if (!isAdmin(req.session.user, room)) {
+    return res.status(403).json({ error: '管理者しか追加できません' });
+  }
+
+  if (!room.users.includes(username)) {
+    return res.status(400).json({ error: 'そのユーザーはこのルームにいません' });
+  }
+
+  if (!room.admins.includes(username)) {
+    room.admins.push(username);
+    await fs.writeJSON(ROOMS_FILE, rooms, { spaces: 2 });
+    return res.json({ success: true });
+  } else {
+    return res.status(400).json({ error: 'すでに管理者です' });
+  }
+});
+app.post('/api/rooms/:roomName/leave', requireLogin, async (req, res) => {
+  const { roomName } = req.params;
+  const username = req.session.user;
+
+  let rooms = await fs.readJSON(ROOMS_FILE).catch(() => []);
+  const room = rooms.find(r => r.name === roomName);
+  if (!room) return res.status(404).json({ error: 'ルームが存在しません' });
+
+  // 管理者が唯一なら離脱させない
+  if (room.admins?.length === 1 && room.admins[0] === username) {
+    return res.status(400).json({ error: '唯一の管理者は離脱できません' });
+  }
+
+  room.users = room.users.filter(u => u !== username);
+  room.admins = room.admins.filter(u => u !== username);
+  await fs.writeJSON(ROOMS_FILE, rooms, { spaces: 2 });
+
+  res.json({ success: true });
 });

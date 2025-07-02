@@ -30,6 +30,30 @@ async function loadRooms() {
     opt.value = room.name;
     opt.textContent = room.name;
     roomSelector.appendChild(opt);
+    let roomMap = {}; // ← ルーム情報を保存する辞書（管理者チェック用）
+
+async function loadRooms() {
+  const res = await fetch('/api/rooms');
+  const rooms = await res.json();
+
+  roomMap = {}; // 初期化
+
+  roomSelector.innerHTML = '';
+  rooms.forEach(room => {
+    roomMap[room.name] = room; // ← 各ルームの情報を記録
+    const opt = document.createElement('option');
+    opt.value = room.name;
+    opt.textContent = room.name;
+    roomSelector.appendChild(opt);
+  });
+
+  if (rooms.length > 0) {
+    currentRoom = rooms[0].name;
+    roomSelector.value = currentRoom;
+    joinRoom(currentRoom);
+    updateRoomControls(); // ← 管理者UIの表示/非表示を更新
+  }
+}
   });
 
   if (rooms.length > 0) {
@@ -271,4 +295,95 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('ユーザー名取得失敗:', err);
       userDisplay.textContent = '通信エラー';
     });
+});
+const roomControls = document.getElementById('room-controls');
+const deleteRoomBtn = document.getElementById('delete-room-btn');
+
+// 管理者だけ操作ボタンを表示
+function updateRoomControls() {
+  if (!currentRoom || !roomMap[currentRoom]) return;
+
+  const room = roomMap[currentRoom];
+  const isAdmin = room.admins && room.admins.includes(currentUser);
+
+  roomControls.style.display = isAdmin ? 'block' : 'none';
+}
+
+// ルーム切り替え時にも表示制御
+roomSelector.addEventListener('change', () => {
+  currentRoom = roomSelector.value;
+  joinRoom(currentRoom);
+  updateRoomControls(); // ← 追加
+});
+
+// 削除ボタンの処理
+deleteRoomBtn.addEventListener('click', async () => {
+  if (!currentRoom) return;
+  const confirmed = confirm(`${currentRoom} を本当に削除しますか？`);
+  if (!confirmed) return;
+
+  const res = await fetch(`/api/rooms/${currentRoom}/delete`, {
+    method: 'POST',
+    credentials: 'include',
+  });
+
+  if (res.ok) {
+    alert('ルームを削除しました');
+    await loadRooms(); // ルームリスト更新
+  } else {
+    const err = await res.json();
+    alert(err.error || '削除に失敗しました');
+  }
+});
+const groupSettingsModal = document.getElementById('group-settings-modal');
+const openGroupSettingsBtn = document.getElementById('open-group-settings-btn');
+const closeGroupSettingsBtn = document.getElementById('close-group-settings');
+const memberList = document.getElementById('member-list');
+const adminActions = document.getElementById('admin-actions');
+const leaveRoomBtn = document.getElementById('leave-room-btn');
+
+// 表示
+openGroupSettingsBtn.addEventListener('click', () => {
+  updateGroupSettings();
+  groupSettingsModal.style.display = 'flex';
+});
+
+// 閉じる
+closeGroupSettingsBtn.addEventListener('click', () => {
+  groupSettingsModal.style.display = 'none';
+});
+
+// モーダル内容更新
+function updateGroupSettings() {
+  if (!currentRoom || !roomMap[currentRoom]) return;
+  const room = roomMap[currentRoom];
+  const isAdmin = room.admins?.includes(currentUser);
+  const members = room.users || [];
+
+  memberList.innerHTML = '';
+  members.forEach(member => {
+    const li = document.createElement('li');
+    li.textContent = `${member}${room.admins?.includes(member) ? ' 👑' : ''}`;
+    memberList.appendChild(li);
+  });
+
+  adminActions.style.display = isAdmin ? 'block' : 'none';
+}
+
+// 離脱ボタン処理
+leaveRoomBtn.addEventListener('click', async () => {
+  if (!confirm('このルームから退出しますか？')) return;
+
+  const res = await fetch(`/api/rooms/${currentRoom}/leave`, {
+    method: 'POST',
+    credentials: 'include'
+  });
+
+  if (res.ok) {
+    alert('ルームから退出しました');
+    groupSettingsModal.style.display = 'none';
+    await loadRooms();
+  } else {
+    alert('退出に失敗しました');
+  }
 });
