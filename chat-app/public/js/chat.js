@@ -6,6 +6,7 @@ const roomSelector = document.getElementById('room-selector');
 
 let currentUser = null;
 let currentRoom = null;
+let roomMap = {}; 
 
 // ユーザーを取得（サーバーにセッションが必要）
 async function fetchUser() {
@@ -24,23 +25,12 @@ async function loadRooms() {
   const res = await fetch('/api/rooms');
   const rooms = await res.json();
 
-  roomSelector.innerHTML = '';
-  rooms.forEach(room => {
-    const opt = document.createElement('option');
-    opt.value = room.name;
-    opt.textContent = room.name;
-    roomSelector.appendChild(opt);
-    let roomMap = {}; // ← ルーム情報を保存する辞書（管理者チェック用）
-
-async function loadRooms() {
-  const res = await fetch('/api/rooms');
-  const rooms = await res.json();
-
-  roomMap = {}; // 初期化
+  roomMap = {}; // ← グローバルの roomMap を初期化
 
   roomSelector.innerHTML = '';
   rooms.forEach(room => {
-    roomMap[room.name] = room; // ← 各ルームの情報を記録
+    roomMap[room.name] = room; // ← 正しくグローバルの roomMap に格納
+
     const opt = document.createElement('option');
     opt.value = room.name;
     opt.textContent = room.name;
@@ -51,17 +41,10 @@ async function loadRooms() {
     currentRoom = rooms[0].name;
     roomSelector.value = currentRoom;
     joinRoom(currentRoom);
-    updateRoomControls(); // ← 管理者UIの表示/非表示を更新
+    updateRoomControls(); // 管理者UI制御
   }
 }
-  });
 
-  if (rooms.length > 0) {
-    currentRoom = rooms[0].name;
-    roomSelector.value = currentRoom;
-    joinRoom(currentRoom);
-  }
-}
 
 roomSelector.addEventListener('change', () => {
   currentRoom = roomSelector.value;
@@ -361,9 +344,37 @@ function updateGroupSettings() {
   const members = room.users || [];
 
   memberList.innerHTML = '';
+
   members.forEach(member => {
     const li = document.createElement('li');
     li.textContent = `${member}${room.admins?.includes(member) ? ' 👑' : ''}`;
+
+    if (isAdmin && member !== currentUser) {
+      const toggleBtn = document.createElement('button');
+      const isTargetAdmin = room.admins?.includes(member);
+      toggleBtn.textContent = isTargetAdmin ? '👑 降格' : '👑 昇格';
+
+      toggleBtn.onclick = async () => {
+        const action = isTargetAdmin ? 'remove' : 'add';
+        const res = await fetch(`/api/rooms/${currentRoom}/admins`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ targetUser: member, action })
+        });
+        const result = await res.json();
+        if (res.ok) {
+          alert('変更しました');
+          await loadRooms(); // 再読み込み
+          updateGroupSettings(); // 表示更新
+        } else {
+          alert(result.error || '変更に失敗しました');
+        }
+      };
+
+      li.appendChild(toggleBtn);
+    }
+
     memberList.appendChild(li);
   });
 

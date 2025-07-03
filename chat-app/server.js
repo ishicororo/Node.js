@@ -379,3 +379,29 @@ app.post('/api/rooms/:roomName/leave', requireLogin, async (req, res) => {
 
   res.json({ success: true });
 });
+// API: 管理者を追加または削除
+app.post('/api/rooms/:roomName/admins', requireLogin, async (req, res) => {
+  const { roomName } = req.params;
+  const { targetUser, action } = req.body; // action: 'add' or 'remove'
+
+  const rooms = await fs.readJSON(ROOMS_FILE).catch(() => []);
+  const room = rooms.find(r => r.name === roomName);
+  if (!room) return res.status(404).json({ error: 'ルームが存在しません' });
+
+  if (!room.admins) room.admins = [room.createdBy];
+  const isAdmin = room.admins.includes(req.session.user);
+  if (!isAdmin) return res.status(403).json({ error: '管理者権限がありません' });
+
+  if (action === 'add') {
+    if (!room.users.includes(targetUser)) return res.status(400).json({ error: 'そのユーザーはルームに参加していません' });
+    if (!room.admins.includes(targetUser)) room.admins.push(targetUser);
+  } else if (action === 'remove') {
+    room.admins = room.admins.filter(u => u !== targetUser);
+    if (room.admins.length === 0) room.admins.push(room.createdBy); // 少なくとも1人
+  } else {
+    return res.status(400).json({ error: '不正な操作です' });
+  }
+
+  await fs.writeJSON(ROOMS_FILE, rooms, { spaces: 2 });
+  res.json({ success: true });
+});
